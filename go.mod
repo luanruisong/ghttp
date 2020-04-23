@@ -1,4 +1,4 @@
-module greq
+module github.com/luanruisong/greq
 
 go 1.12
 
