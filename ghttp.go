@@ -6,6 +6,8 @@ import (
 	jsoniter "github.com/json-iterator/go"
 	"net"
 	"net/http"
+	"net/url"
+	"reflect"
 	"strings"
 	"time"
 )
@@ -35,11 +37,22 @@ func jsonReader(i interface{}) *strings.Reader {
 }
 
 func formReader(i interface{}) *strings.Reader {
-	str, err := jsoniter.MarshalToString(i)
-	if err != nil {
+	if i == nil {
 		return nil
 	}
-	return strings.NewReader(str)
+	values := url.Values{}
+	v := reflect.ValueOf(i)
+	t := v.Type()
+	for i := 0;i<t.NumField();i++ {
+		f := t.Field(i)
+		vf := v.Field(i)
+		name := f.Tag.Get("form")
+		if len(name) == 0 {
+			name = f.Name
+		}
+		values.Add(name,fmt.Sprintf("%v",vf.Interface()))
+	}
+	return strings.NewReader(values.Encode())
 }
 
 func defReader(i interface{}) *strings.Reader {
