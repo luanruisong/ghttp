@@ -24,17 +24,17 @@ func (r *Request) buildResp(res *http.Response) *Resp {
 	return myResp
 }
 
-func (r *Request) buildReq(method string, param *strings.Reader) (*http.Request,error) {
-	req, err := http.NewRequest(r.url, method, param)
+func (r *Request) buildReq(method string, param *strings.Reader) (*http.Request, error) {
+	req, err := http.NewRequest(method, r.url, param)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 	req.Header = r.header
-	return req,nil
+	return req, nil
 }
 
 func (r *Request) do(method string, param *strings.Reader) *Resp {
-	rawReq,err := r.buildReq(method, param)
+	rawReq, err := r.buildReq(method, param)
 	if err != nil {
 		return &Resp{
 			Ok:  false,
