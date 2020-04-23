@@ -1,4 +1,4 @@
-module ghttp
+module greq
 
 go 1.12
 
