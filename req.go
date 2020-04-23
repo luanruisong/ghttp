@@ -27,7 +27,7 @@ func (r *Request) buildResp(res *http.Response) *Resp {
 func (r *Request) buildReq(method string, param *strings.Reader) (*http.Request,error) {
 	req, err := http.NewRequest(r.url, method, param)
 	if err != nil {
-		return nil,errs
+		return nil,err
 	}
 	req.Header = r.header
 	return req,nil
