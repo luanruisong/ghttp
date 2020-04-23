@@ -1,4 +1,4 @@
-package ghttp
+package greq
 
 import jsoniter "github.com/json-iterator/go"
 
