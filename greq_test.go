@@ -73,3 +73,20 @@ func TestErrRes(t *testing.T){
 	}
 }
 
+func TestMapForm(t *testing.T){
+	resp := NewForm("https://baidu.com").Get(map[string]string{"k":"1"})
+	if resp.Ok {
+		t.Log("send to baidu success")
+	} else {
+		t.Error(resp.Err.Error())
+	}
+}
+
+func TestMapSliceForm(t *testing.T){
+	resp := NewForm("https://baidu.com").Get(map[string][]string{"k":{"1","2"}})
+	if resp.Ok {
+		t.Log("send to baidu success")
+	} else {
+		t.Error(resp.Err.Error())
+	}
+}
