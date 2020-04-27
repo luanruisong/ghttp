@@ -46,14 +46,39 @@ func formReader(i interface{}) io.Reader {
 	values := url.Values{}
 	v := reflect.ValueOf(i)
 	t := v.Type()
-	for i := 0; i < t.NumField(); i++ {
-		f := t.Field(i)
-		vf := v.Field(i)
-		name := f.Tag.Get("form")
-		if len(name) == 0 {
-			name = f.Name
+
+	switch t.Kind(){
+	case reflect.Ptr:
+		v = v.Elem()
+		fallthrough
+	case reflect.Map:
+		iter := v.MapRange()
+		for iter.Next() {
+			k := fmt.Sprintf("%v",iter.Key().Interface())
+			iv := iter.Value()
+			kind := iv.Kind()
+			if kind == reflect.Slice || kind == reflect.Array  {
+				for idx := 0 ;idx < iv.Len() ; idx ++ {
+					currValue := iv.Index(idx).Interface()
+					values.Add(k,fmt.Sprintf("%v", currValue))
+				}
+			} else {
+				values.Add(
+					k,
+					fmt.Sprintf("%v", iter.Value().Interface()),
+				)
+			}
 		}
-		values.Add(name, fmt.Sprintf("%v", vf.Interface()))
+	case reflect.Struct:
+		for i := 0; i < t.NumField(); i++ {
+			f := t.Field(i)
+			vf := v.Field(i)
+			name := f.Tag.Get("form")
+			if len(name) == 0 {
+				name = f.Name
+			}
+			values.Add(name, fmt.Sprintf("%v", vf.Interface()))
+		}
 	}
 	return strings.NewReader(values.Encode())
 }
