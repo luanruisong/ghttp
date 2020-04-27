@@ -1,9 +1,9 @@
 package greq
 
 import (
+	"io"
 	"io/ioutil"
 	"net/http"
-	"strings"
 )
 
 func (r *Request) buildResp(res *http.Response) *Resp {
@@ -19,12 +19,13 @@ func (r *Request) buildResp(res *http.Response) *Resp {
 		myResp.Err = err
 	} else {
 		myResp.RawBody = rawBody
-		myResp.Body = string(myResp.RawBody)
+		body := string(rawBody)
+		myResp.Body = body
 	}
 	return myResp
 }
 
-func (r *Request) buildReq(method string, param *strings.Reader) (*http.Request, error) {
+func (r *Request) buildReq(method string, param io.Reader) (*http.Request, error) {
 	req, err := http.NewRequest(method, r.url, param)
 	if err != nil {
 		return nil, err
@@ -33,8 +34,9 @@ func (r *Request) buildReq(method string, param *strings.Reader) (*http.Request,
 	return req, nil
 }
 
-func (r *Request) do(method string, param *strings.Reader) *Resp {
-	rawReq, err := r.buildReq(method, param)
+func (r *Request) do(method string, param interface{}) *Resp {
+	reader := r.reader(param)
+	rawReq, err := r.buildReq(method, reader)
 	if err != nil {
 		return &Resp{
 			Ok:  false,
@@ -52,21 +54,21 @@ func (r *Request) do(method string, param *strings.Reader) *Resp {
 }
 
 func (r *Request) Get(p interface{}) *Resp {
-	return r.do(http.MethodGet, r.reader(p))
+	return r.do(http.MethodGet, p)
 }
 
 func (r *Request) Post(p interface{}) *Resp {
-	return r.do(http.MethodPost, r.reader(p))
+	return r.do(http.MethodPost, p)
 }
 
 func (r *Request) Put(p interface{}) *Resp {
-	return r.do(http.MethodPut, r.reader(p))
+	return r.do(http.MethodPut, p)
 }
 
 func (r *Request) Delete(p interface{}) *Resp {
-	return r.do(http.MethodDelete, r.reader(p))
+	return r.do(http.MethodDelete, p)
 }
 
 func (r *Request) Options(p interface{}) *Resp {
-	return r.do(http.MethodOptions, r.reader(p))
+	return r.do(http.MethodOptions, p)
 }

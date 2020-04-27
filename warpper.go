@@ -1,8 +1,8 @@
 package greq
 
 import (
+	"io"
 	"net/http"
-	"strings"
 )
 
 type (
@@ -27,5 +27,5 @@ type (
 		reader ReaderHandler
 	}
 
-	ReaderHandler func(interface{}) *strings.Reader
+	ReaderHandler func(interface{}) io.Reader
 )
